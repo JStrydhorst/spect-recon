@@ -35,8 +35,7 @@ int main(int argc, char* argv[])
 	//Projection* proj_10;
 
 	// parse command line
-	//sprintf(working_dir,"%s", argv[1]);
-	sprintf(working_dir,"%s", "c:\\SPECT\\2011_11_Abs_in_vivo\\rat1");
+	sprintf(working_dir,"%s", argv[1]);
 
 	// create projection data
 	sprintf(filename, "%s"__SL"SPECT.dcm",working_dir);	// default data file is SPECT.dcm; should verify existence
