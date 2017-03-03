@@ -1,15 +1,18 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "Projection.h"
+#include "Reconstruction.h"
+
+#include "version.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
 #include <ctime>
+
 #include <iostream>
 #include <fstream>
 
-#include "recon4d.h"
-
-using namespace std;
 
 #ifdef _WIN32
 #define __SL "\\"
@@ -19,7 +22,7 @@ using namespace std;
 #define __HOME getenv("HOME")
 #endif
 
-#define SPECT_OSEM_CPP_VER 1
+#define SPECT_OSEM_CPP_VER 2
 
 int main(int argc, char* argv[])
 {
@@ -35,15 +38,15 @@ int main(int argc, char* argv[])
 	float filter_fwhm = 0.0f, filter_sigma=0.0f;
 	float update_threshold = 0.1f;		// pixels where the normalization falls below the threshold are not updated, default 0.1
 	float half_life = 360.35f;			// default is the halflife (in minutes) of Tc-99m. Should obtain from DICOM file.
-	float beta_s = 0.0f, delta=1.0f;			// weighting and parameter of spatial MAP prior
+	float beta_s = 0.0f, delta=1.0f;	// weighting and parameter of spatial MAP prior
 	float beta_t = 0.0f;				// weighting of temporal MAP prior
-	float beta_CT = 0.0f; // delta_CT = 20.0f;				// CT prior, delta_CT defines the difference required for a CT boundary
+	float beta_CT = 0.0f; 				// delta_CT = 20.0f;	// CT prior, delta_CT defines the difference required for a CT boundary
 	float atten_scale = 1.0f;			// for scaling the attenuation map
 
 	time_t rawtime;
 	tm* time_info;
 	char dt_string[10];		// string for naming files and writing info
-	ofstream recon_info;
+	std::ofstream recon_info;
 
 	char working_dir[260];
 	char sysmat_dir[260];
@@ -66,7 +69,7 @@ int main(int argc, char* argv[])
 	int n_subsets[] = {6,4,3,1};
 	int n_iter = 8;
 
-	ifstream f;
+	std::ifstream f;
 
 	// Projection and recon data
 	Projection* ProjectionData;		// original projection set file
@@ -86,7 +89,7 @@ int main(int argc, char* argv[])
 	Projection** GatedScatter;		// gated scatter data
 	Projection*** Scatter_Subsets;	// scatter chopped up into subsets
 
-	cout << endl;
+	std::cout << std::endl;
 
 
 	// Set defaults and parse command line
@@ -118,7 +121,7 @@ int main(int argc, char* argv[])
 						// check that scatter_k is reasonable?
 						if (scatter_k == 0.0f)
 						{
-							cout << "Invalid scatter coefficient\n";
+							std::cout << "Invalid scatter coefficient\n";
 							scatter = false;
 						}
 					}
@@ -200,7 +203,7 @@ int main(int argc, char* argv[])
 				log_voi_activity = true;
 			else
 			{
-				cout << "Unsupported option `" << argv[arg] << "'" << endl;
+				std::cout << "Unsupported option `" << argv[arg] << "'" << std::endl;
 				return 0;
 			}
 
@@ -215,11 +218,11 @@ int main(int argc, char* argv[])
 	sprintf(filename,"%s" __SL "recon_info_%s.txt",working_dir,dt_string);
 	recon_info.open(filename);
 
-	cout << "SPECT4D v" << SPECT4D_MAJOR_VERSION << "." << SPECT4D_MINOR_VERSION << "." << SPECT_OSEM_CPP_VER << endl;
-	cout << "Working directory: " << working_dir << endl << endl;
+	std::cout << "SPECT4D v" << SPECT4D_MAJOR_VERSION << "." << SPECT4D_MINOR_VERSION << "." << SPECT_OSEM_CPP_VER << std::endl;
+	std::cout << "Working directory: " << working_dir << std::endl << std::endl;
 
-	recon_info << "SPECT4D v" << SPECT4D_MAJOR_VERSION << "." << SPECT4D_MINOR_VERSION << "." << SPECT_OSEM_CPP_VER << endl;
-	recon_info << "Working directory: " << working_dir << endl << endl;
+	recon_info << "SPECT4D v" << SPECT4D_MAJOR_VERSION << "." << SPECT4D_MINOR_VERSION << "." << SPECT_OSEM_CPP_VER << std::endl;
+	recon_info << "Working directory: " << working_dir << std::endl << std::endl;
 
 	char *atten_dir;
 	if(atten_corr | create_atten_map)
@@ -232,12 +235,12 @@ int main(int argc, char* argv[])
 			sprintf(atten_dir, "%s" __SL "atten_%.2f", working_dir, atten_scale);
 	}
 	else
-		atten_dir = NULL;
+		atten_dir = 0;
 
 	sprintf(proj_file, "%s" __SL "SPECT.dcm",working_dir);	// default data file is SPECT.dcm; should verify existence
 	ProjectionData = new Projection(proj_file);
 	ProjectionData->ProjectionInfo();
-	recon_info << "Projection Data:" << proj_file << endl;
+	recon_info << "Projection Data:" << proj_file << std::endl;
 
 	n_timeslots = ProjectionData->GetNumTimeSlots();
 	TrueProj = ProjectionData->SplitTimeSlots();
@@ -256,13 +259,13 @@ int main(int argc, char* argv[])
 		OSEM_Recon = new Reconstruction(recon_xy, recon_z, 1, recon_res, file_list);		// reconstruction
 		OSEM_Recon->ReconstructionInfo();
 	
-		cout << "Creating attenuation maps..." << endl;
+		std::cout << "Creating attenuation maps..." << std::endl;
 
 		sprintf(filename,"%s" __SL "%s",sysmat_dir,"APT2.pin");
 	
 		OSEM_Recon->CreateMMPAttenMap(atten_dir, filename, TrueProj[0], atten_scale);
 
-		recon_info << "Created attenuation maps in: " << atten_dir << endl;
+		recon_info << "Created attenuation maps in: " << atten_dir << std::endl;
 		recon_info.close();
 
 		delete TrueProj;
@@ -275,69 +278,69 @@ int main(int argc, char* argv[])
 	OSEM_Recon->ReconstructionInfo();
 
 
-	recon_info << "Reconstruction dimensions: " << recon_xy << " x " << recon_xy << " x " << recon_z << ", " << recon_res << " mm voxels" << endl;
+	recon_info << "Reconstruction dimensions: " << recon_xy << " x " << recon_xy << " x " << recon_z << ", " << recon_res << " mm voxels" << std::endl;
 	if(n_timeslots>1)
-		recon_info << "Time Slots: " << n_timeslots << endl;
+		recon_info << "Time Slots: " << n_timeslots << std::endl;
 
 	// Physics corrections
 	if(atten_corr)
 	{
-		cout << "Attenuation correction enabled." << endl;
-		recon_info << "Attenuation correction enabled." << endl;
+		std::cout << "Attenuation correction enabled." << std::endl;
+		recon_info << "Attenuation correction enabled." << std::endl;
 		if(atten_scale != 1.0f)
-			recon_info << "Using broad-beam attenuation, " << atten_scale << endl;
+			recon_info << "Using broad-beam attenuation, " << atten_scale << std::endl;
 	}
 	if(scatter)
 	{
-		cout << "Scatter compensation enabled. (k=" << scatter_k << ")" << endl;
-		recon_info << "Scatter compensation enabled. (k=" << scatter_k << ")" << endl;
+		std::cout << "Scatter compensation enabled. (k=" << scatter_k << ")" << std::endl;
+		recon_info << "Scatter compensation enabled. (k=" << scatter_k << ")" << std::endl;
 	}
 	if(scatter && !atten_corr)
-		cout << "Scatter compensation without attenuation correction is sort of dumb." << endl;
+		std::cout << "Scatter compensation without attenuation correction is sort of dumb." << std::endl;
 
 	// Recon algorithm options (filtering, voxel limits, support thresholds)
 	if(filter_sigma > 0.0f)
 	{
-		cout << "Post filtering enabled: FWHM=" << filter_fwhm << " mm (sigma=" << filter_sigma << ")" << endl;
-		recon_info << "Post filtering enabled: FWHM=" << filter_fwhm << " mm (sigma=" << filter_sigma << ")" << endl;
+		std::cout << "Post filtering enabled: FWHM=" << filter_fwhm << " mm (sigma=" << filter_sigma << ")" << std::endl;
+		recon_info << "Post filtering enabled: FWHM=" << filter_fwhm << " mm (sigma=" << filter_sigma << ")" << std::endl;
 	}
 	if(pixel_limit > 0.0f)
 	{
-		cout << "Voxel values limited to: " << pixel_limit << endl;
-		recon_info << "Voxel values limited to: " << pixel_limit << endl;
+		std::cout << "Voxel values limited to: " << pixel_limit << std::endl;
+		recon_info << "Voxel values limited to: " << pixel_limit << std::endl;
 	}
 	if(update_threshold > 0.0f)
 	{
-		cout << "Voxels with support < " << update_threshold << " ignored." << endl;
-		recon_info << "Voxels with support < " << update_threshold << " ignored." << endl;
+		std::cout << "Voxels with support < " << update_threshold << " ignored." << std::endl;
+		recon_info << "Voxels with support < " << update_threshold << " ignored." << std::endl;
 	}
 	
 	// MAP and CT prior info
 	if(beta_s > 0.0f)
 	{
-		cout << "Spatial smoothing prior, beta=" << beta_s << ", delta=" << delta << endl;
-		recon_info << "Spatial smoothing prior, beta=" << beta_s << ", delta=" << delta << endl;
+		std::cout << "Spatial smoothing prior, beta=" << beta_s << ", delta=" << delta << std::endl;
+		recon_info << "Spatial smoothing prior, beta=" << beta_s << ", delta=" << delta << std::endl;
 	}
 	if(beta_CT > 0.0f)
 	{
-		cout << "Using CT prior: " << atten_map << ", beta=" << beta_s << ", delta=" << delta << "." << endl;
-		recon_info << "Using CT prior: " << atten_map << ", beta=" << beta_s << ", delta=" << delta << "." << endl;
+		std::cout << "Using CT prior: " << atten_map << ", beta=" << beta_s << ", delta=" << delta << "." << std::endl;
+		recon_info << "Using CT prior: " << atten_map << ", beta=" << beta_s << ", delta=" << delta << "." << std::endl;
 	}
 	if(beta_t > 0.0f)
 	{
-		cout << "Temporal smoothing prior, beta=" << beta_t << ", delta=" << delta << endl;
-		recon_info << "Temporal smoothing prior, beta=" << beta_t << endl;
+		std::cout << "Temporal smoothing prior, beta=" << beta_t << ", delta=" << delta << std::endl;
+		recon_info << "Temporal smoothing prior, beta=" << beta_t << std::endl;
 	}
 
 
 	OSEM_TempRecon = new Reconstruction(recon_xy,recon_z,1,recon_res);	// temp recon only need one
 	
 	// Load projection tables
-	cout << "System matrix directory: " << sysmat_dir << endl << endl;
-	cout << "Loading projection tables..." << endl << endl;
+	std::cout << "System matrix directory: " << sysmat_dir << std::endl << std::endl;
+	std::cout << "Loading projection tables..." << std::endl << std::endl;
 	if(OSEM_Recon->LoadProjTables(TrueProj[0],sysmat_dir) == -1)
 	{
-		cout << "Error loading projection tables." << endl;
+		std::cout << "Error loading projection tables." << std::endl;
 		return -1;
 	}
 
@@ -346,7 +349,7 @@ int main(int argc, char* argv[])
 		MAP_Partials = new Reconstruction(recon_xy,recon_z,1,recon_res);
 	}
 	else
-		MAP_Partials = NULL;
+		MAP_Partials = 0;
 
 	if(beta_CT > 0.0f)
 	{
@@ -354,7 +357,7 @@ int main(int argc, char* argv[])
 		CT_Prior = new Reconstruction(recon_xy,recon_z,1,recon_res,file_list);
 	}
 	else
-		CT_Prior = NULL;
+		CT_Prior = 0;
 
 
 	// load scatter data
@@ -378,7 +381,7 @@ int main(int argc, char* argv[])
 	else
 			sprintf(filename, "%s" __SL "norms" __SL "norm_no_att_1_0.bin", working_dir);
 
-	f.open(filename,ios::in);
+	f.open(filename,std::ios::in);
 	if(f.is_open())
 		f.close();
 	else
@@ -392,7 +395,7 @@ int main(int argc, char* argv[])
 
 	for(group = 0; group < n_groups; group++)
 	{
-		cout << "Group: " << group+1 << endl;
+		std::cout << "Group: " << group+1 << std::endl;
 		// split the projections up into subsets
 		for(t=0;t<n_timeslots;t++)
 			OSEM_Subsets[t] = TrueProj[t]->CreateOrderedSubsets(n_subsets[group]);
@@ -404,7 +407,7 @@ int main(int argc, char* argv[])
 				Scatter_Subsets[t] = GatedScatter[t]->CreateOrderedSubsets(n_subsets[group]);
 				
 		// create or load the normalization
-		cout << "Generating normalization matrices..." << endl;
+		std::cout << "Generating normalization matrices..." << std::endl;
 		OSEM_Norms = new Reconstruction*[n_subsets[group]];
 		for(subset=0;subset<n_subsets[group];subset++)
 		{
@@ -417,12 +420,12 @@ int main(int argc, char* argv[])
 			else
 				sprintf(filename, "%s" __SL "norms" __SL "norm_no_att_%d_%d.bin", working_dir, n_subsets[group], subset);
 
-			f.open(filename,ios::in);
+			f.open(filename,std::ios::in);
 
 			if(f.is_open())
 			{
 				f.close();
-				cout << ".";
+				std::cout << ".";
 				file_list[0] = atten_map;
 				OSEM_Norms[subset] = new Reconstruction(recon_xy,recon_z,1,recon_res,file_list);
 			}
@@ -435,20 +438,20 @@ int main(int argc, char* argv[])
 				delete NormProj;
 			}
 		}
-		cout << endl;
+		std::cout << std::endl;
 
 		// main reconstruction loop
 		for(iter=0;iter<n_iter;iter++)
 		{
 
-			cout << "Iteration: " << iter+1 << endl;
+			std::cout << "Iteration: " << iter+1 << std::endl;
 			for(subset=0;subset<n_subsets[group];subset++)
 			{
-				cout << "Subset: " << subset+1 << endl;
+				std::cout << "Subset: " << subset+1 << std::endl;
 				for(t=0;t<n_timeslots;t++)
 				{
 					if(n_timeslots>1)
-						cout << "t=" << t << endl;
+						std::cout << "t=" << t << std::endl;
 					OSEM_TempProj[subset]->SetTimeslot(t+1);	// timeslot numbering in projections starts with 1
 					OSEM_Recon->Project(OSEM_TempProj[subset], atten_dir);
 					//OSEM_TempProj[subset]->ApplyOffsets(0); these corrections might be applied by acquisition software. Hard to tell.
@@ -485,11 +488,11 @@ int main(int argc, char* argv[])
 #ifdef VOI_LOG
 					// log activity in VOI
 					if(log_voi_activity)
-						recon_info << group << ", "<< iter << ", " << subset << ", " << t << ": " << OSEM_Recon->VOIActivity() << endl;
+						recon_info << group << ", "<< iter << ", " << subset << ", " << t << ": " << OSEM_Recon->VOIActivity() << std::endl;
 #endif
 				}
 			}
-			cout << endl;
+			std::cout << std::endl;
 
 			//OSEM_Recon->CleanUpStrayPixels(MLEM_Norm, pixel_limit);
 			if (pixel_limit > 0.0f)

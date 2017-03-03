@@ -1,3 +1,6 @@
+#ifndef __PROJTABLE_H
+#define __PROJTABLE_H
+
 typedef unsigned char uchar;
 
 /********************************************************************************************
@@ -6,7 +9,7 @@ typedef unsigned char uchar;
 class ProjTable
 {
 public:
-	ProjTable(char* filename = NULL);
+	ProjTable(char* filename = 0);
 	~ProjTable();
 
 	ProjTable* Abridge(float threshold);
@@ -27,3 +30,4 @@ private:
 	float *weight;					// weighting of projected voxel
 };
 
+#endif //__PROJTABLE_H

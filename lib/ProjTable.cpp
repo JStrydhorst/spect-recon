@@ -1,10 +1,7 @@
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
+#include "ProjTable.h"
 
-#include "proj_table.h"
-
-using namespace std;
+#include<iostream>
+#include<fstream>
 
 ProjTable::ProjTable(char* filename)
 {
@@ -24,9 +21,9 @@ ProjTable::ProjTable(char* filename)
 			pj = new uchar[mem_alloc];
 			weight = new float[mem_alloc];
 		}
-		catch(bad_alloc& ba)
+		catch(std::bad_alloc& ba)
 		{
-			cout << "ProjTable(char*): bad_alloc caught: " << ba.what() << endl;
+			std::cout << "ProjTable(char*): bad_alloc caught: " << ba.what() << std::endl;
 		}
 	}
 }
@@ -92,9 +89,9 @@ void ProjTable::AddEntry(uchar new_ri, uchar new_rj, uchar new_rk, uchar new_pi,
 			delete [] weight;
 			weight = temp_float_p;
 		}
-		catch(bad_alloc& ba)
+		catch(std::bad_alloc& ba)
 		{
-			cout << "ProjTable::AddEntry(): bad_alloc caught: "<< ba.what() << endl;
+			std::cout << "ProjTable::AddEntry(): bad_alloc caught: "<< ba.what() << std::endl;
 			return;
 		}
 
@@ -113,9 +110,9 @@ void ProjTable::AddEntry(uchar new_ri, uchar new_rj, uchar new_rk, uchar new_pi,
 
 void ProjTable::SaveProjTable(char* filename)
 {
-	ofstream f;
+	std::ofstream f;
 
-	f.open(filename,ios::binary);
+	f.open(filename,std::ios::binary);
 
 	f.write(reinterpret_cast<char*>(&n),sizeof(unsigned int));
 	f.write(reinterpret_cast<char*>(ri),n*sizeof(unsigned char));
@@ -134,9 +131,9 @@ int ProjTable::LoadProjTable(char* filename)
 
 	unsigned int i;
 
-	ifstream f;
+	std::ifstream f;
 
-	f.open(filename,ios::binary);
+	f.open(filename,std::ios::binary);
 
 	f.read(reinterpret_cast<char*>(&n),sizeof(unsigned int));
 
@@ -150,9 +147,9 @@ int ProjTable::LoadProjTable(char* filename)
 		pj = new uchar[n];
 		weight = new float[n];
 	}
-	catch(bad_alloc&)
+	catch(std::bad_alloc&)
 	{
-		cout << "Error allocating memory." << endl;
+		std::cout << "Error allocating memory." << std::endl;
 		return -1;
 	}
 
@@ -179,7 +176,7 @@ void ProjTable::ProjTableStats()
 	min = weight[0];
 	max = weight[0];
 
-	cout << "Size of table: " << n << endl;
+	std::cout << "Size of table: " << n << std::endl;
 	for(i=0;i<n;i++)
 	{
 		if (weight[i] < min) min = weight[i];
@@ -188,10 +185,10 @@ void ProjTable::ProjTableStats()
 			//cout << int(ri[i]) << "," << int(rj[i]) << "," << int(rk[i]) << " --> " << int(pi[i]) << "," << int(pj[i]) << "     " << weight[i] << endl;
 	}
 
-	cout << "Min value: " << min << endl;
-	cout << "Max value: " << max << endl;
+	std::cout << "Min value: " << min << std::endl;
+	std::cout << "Max value: " << max << std::endl;
 
-	cout << endl;
+	std::cout << std::endl;
 
 }
 

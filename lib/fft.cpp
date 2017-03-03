@@ -1,11 +1,11 @@
 // Fast Fourier Transforms 
-#include <algorithm>
-#include <cmath>
 
 #include "fft.h"
-#include "fft8g.c"
 
-using namespace std;
+extern "C" void cdft(int, int, double*, int*, double*);
+
+#include <cmath>
+#include <algorithm>
 
 void fft1(float *data_r, float *data_i, int nx, int isign)
 {
@@ -45,9 +45,9 @@ void fft2(float **data_r, float **data_i, int nx, int ny, int isign)
 
 	x_data = new double[2*nx];
 
-	int *ip = new int[2 + int(sqrt(max(nx,ny))) + 1];
+	int *ip = new int[2 + int(sqrt(std::max(nx,ny))) + 1];
 	ip[0] = 0;
-	double *w = new double[max(nx,ny) / 2];
+	double *w = new double[std::max(nx,ny) / 2];
 
 	// transform along x-axis
 	for(i=0;i<ny;i++)
@@ -99,7 +99,7 @@ void fft3(float ***data_r, float ***data_i, int nx, int ny, int nz, int isign)
 	int i, j, k;
 
 	int nn;
-	nn = max(nx, max(ny, nz));
+	nn = std::max(nx, std::max(ny, nz));
 
 	double *temp = new double[nn * 2];
 

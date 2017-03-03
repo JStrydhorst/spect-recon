@@ -1,33 +1,10 @@
+#include "Pinhole.h"
+
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 	
-#include <emmintrin.h>
-
-using namespace std;
-
-/********************************************************************************************
-/ Pinhole class
-/********************************************************************************************/
-class Pinhole
-{
-public:
-	Pinhole(float x, float y, float z, float dia, float angle, float fy, float fz);
-
-	void* operator new(size_t);	// needed to align memory allocation for __m128 variables
-	void operator delete(void*);
-
-	float GetConeAngle() { return cone_angle; }
-	float GetDiameter() { return diameter; }
-	void GetLocation(float* loc) { _mm_store_ps(loc,location); }
-	void GetNormal(float* norm) { _mm_store_ps(norm,normal); }
-
-	__m128 location;
-	__m128 normal;
-	float cone_angle;	// opening angle (cone half-angle)
-	float diameter;
-};
-
 Pinhole::Pinhole(float x, float y, float z, float dia, float angle, float fy, float fz)
 {
 	//fVector _norm;
@@ -58,7 +35,7 @@ void* Pinhole::operator new(size_t size)
 {
 	void *temp,*ptr;
 	temp = malloc(size+15+sizeof(void*));
-	ptr = (void*)( ((int)temp + sizeof(void*) + 15)&~15);
+	ptr = (void*)( ((std::uintptr_t)temp + sizeof(void*) + (size_t)15) & ~0xF);
 	*((void**)ptr-1) = temp;
 	return ptr;
 }
@@ -70,7 +47,7 @@ void Pinhole::operator delete(void* ptr)
 	free(temp);
 }
 
-Pinhole** LoadPinholeGeometry(char* filename, float COR, int &n_pinholes) // loads the pinhole geometry from a file
+Pinhole** Pinhole::LoadPinholeGeometry(char* filename, float COR, int &n_pinholes) // loads the pinhole geometry from a file
 {
 	int i;
 	char temp_str[64];
@@ -82,7 +59,7 @@ Pinhole** LoadPinholeGeometry(char* filename, float COR, int &n_pinholes) // loa
 	float py, pz;
 
 	// open pinhole description file
-	ifstream fin;
+	std::ifstream fin;
 	fin.open(filename);
 
 	// parse file
@@ -92,10 +69,10 @@ Pinhole** LoadPinholeGeometry(char* filename, float COR, int &n_pinholes) // loa
 
 	fin >> temp_str;
 	if(temp_str[0] == '[')
-		cout << "\nLoading pinhole definition " << temp_str << endl;
+		std::cout << "\nLoading pinhole definition " << temp_str << std::endl;
 	else
 	{
-		cout << "\nInvalid pinhole definition file." << endl;
+		std::cout << "\nInvalid pinhole definition file." << std::endl;
 		fin.close();
 		return NULL;
 	}
