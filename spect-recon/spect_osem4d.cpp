@@ -22,7 +22,7 @@
 #define __HOME getenv("HOME")
 #endif
 
-#define SPECT_OSEM_CPP_VER 2
+#define SPECT_OSEM_CPP_VER 5
 
 int main(int argc, char* argv[])
 {
