@@ -141,6 +141,13 @@ Projection::Projection(const char* DCMfilename)
 	int hour, min;
 
 	RootDicomObj* DCM = new RootDicomObj(DCMfilename);
+
+	if(DCM->FindElement(0x0010,0x0010)==0) // look for mandatory patient name field
+	{
+		std::cout << "No valid DICOM data loaded." << std::endl;
+		exit(-1);
+	}
+
 	DicomObj* tempDCM;
 
 	DCM->GetValue(0x0028,0x0010,&temp_us,sizeof(temp_us));

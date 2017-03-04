@@ -57,6 +57,11 @@ RootDicomObj::RootDicomObj(const char* filename, bool hdr_only)
 	unsigned short temp_us;
 
 	f.open(filename,std::fstream::binary);
+	if(!f.is_open())
+	{
+		std::cout << "File " << filename << " not found." << std::endl;
+		return;
+	}
 
 	if(!VRMap_Initialized)
 	{
