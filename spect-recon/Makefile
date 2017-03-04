@@ -26,6 +26,6 @@ spect_recon : $(OBJS) $(LIBS)
 	$(CXX) $(CXXFLAGS) -I$(INC_DIR) $< 
 
 clean :
-	rm *.o
-	$(MAKE) -C $(LIB_DIR) clean
-
+	@rm -f *.o
+	@$(MAKE) -C $(LIB_DIR) clean
+	

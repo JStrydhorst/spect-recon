@@ -20,5 +20,5 @@ RootDicomObj : HDLListObj.h DicomObj.h DataElement.h
 	$(CXX) $(CXXFLAGS) $<
 
 clean :
-	rm *.o
+	@rm -f *.o
 

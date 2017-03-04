@@ -485,11 +485,11 @@ int main(int argc, char* argv[])
 						sprintf(filename, "%s" __SL "current_recon.bin",working_dir);
 						OSEM_Recon->SaveBIN(filename);
 					}
-#ifdef VOI_LOG
+					
 					// log activity in VOI
 					if(log_voi_activity)
 						recon_info << group << ", "<< iter << ", " << subset << ", " << t << ": " << OSEM_Recon->VOIActivity() << std::endl;
-#endif
+				
 				}
 			}
 			std::cout << std::endl;
