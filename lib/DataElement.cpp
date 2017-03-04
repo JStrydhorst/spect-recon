@@ -337,7 +337,7 @@ unsigned long DataElement::GetSize()
 
 // copies the contents of the Value field into buffer
 // returns Length (number of bytes copied)
-unsigned long DataElement::GetValue(void* buffer, unsigned long buf_size)
+uint32_t DataElement::GetValue(void* buffer, unsigned long buf_size)
 {
 	if (VRMap[VR] == VR_SQ)	// SQ data isn't stored in value
 		return -1;
@@ -912,7 +912,7 @@ int DataElement::Validate()
 	return 0;
 }
 
-unsigned long DataElement::GetLength()
+uint32_t DataElement::GetLength()
 {
 	CheckLength();
 	return Length;

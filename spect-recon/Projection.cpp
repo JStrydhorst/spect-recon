@@ -155,7 +155,7 @@ Projection::Projection(const char* DCMfilename)
 	DCM->GetValue(0x0028,0x0011,&temp_us,sizeof(temp_us));
 	ny = temp_us;
 
-	if(DCM->GetValue(0x0054,0x0071,&temp_us,sizeof(temp_us)) != 0xFFFFFFFF)
+	if(DCM->GetValue(0x0054,0x0071,&temp_us,sizeof(temp_us)) != -1L)
 		n_timeslots = temp_us;
 	else
 		n_timeslots = 1;

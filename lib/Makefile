@@ -10,8 +10,8 @@ OBJS := fft.o fft8g.o HDLListObj.o DataElement.o DicomObj.o RootDicomObj.o ProjT
 all : $(OBJS)
 
 DataElement.o : HDLListObj.h DicomObj.h RootDicomObj.h
-DicomObj.h : HDLListObj.h DataElement.h
-RootDicomObj : HDLListObj.h DicomObj.h DataElement.h
+DicomObj.o : HDLListObj.h DataElement.h
+RootDicomObj.o : HDLListObj.h DicomObj.h DataElement.h
 
 %.o : %.c
 	$(CC) $(CFLAGS) $<

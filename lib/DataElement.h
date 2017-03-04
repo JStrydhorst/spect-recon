@@ -57,19 +57,19 @@ public:
 
 	int SetObject(HDLListObj*);						// inserts Dicom Objects into SQ objects
 
-	unsigned short GetGroup() { return Group; }
-	unsigned short GetElement() { return Element; }
-	unsigned long GetLength();
-	unsigned long GetValue(void* buffer, unsigned long buf_size); // copies the Value to buffer and returns Length
+	uint16_t GetGroup() { return Group; }
+	uint16_t GetElement() { return Element; }
+	uint32_t GetLength();
+	uint32_t GetValue(void* buffer, unsigned long buf_size); // copies the Value to buffer and returns Length
 
 	HDLListObj* GetSQObject(int n);		// returns the DicomObject in the SQ DataElement indexed by n;
 	// int GetNumSQObj();	// returns the total number of sequenced objects is function needed?
 
 private:
-	unsigned short Group;
-	unsigned short Element;
+	uint16_t Group;
+	uint16_t Element;
 	std::string VR;
-	unsigned long Length;
+	uint32_t Length;
 	char* Value;
 };
 
