@@ -18,10 +18,16 @@ public:
 
 	float GetConeAngle() { return cone_angle; }
 	float GetDiameter() { return diameter; }
-	void GetLocation(float* loc) { _mm_store_ps(loc,location); }
+	void GetLocation(float* loc) { _mm_store_ps(loc,location.v); }
 	void GetNormal(float* norm) { _mm_store_ps(norm,normal); }
 
-	__m128 location;
+	struct vec128 {
+		union
+		{
+			__m128 v;
+			struct { float x; float y; float z; float w;};
+		};
+	} location;
 	__m128 normal;
 	float cone_angle;	// opening angle (cone half-angle)
 	float diameter;

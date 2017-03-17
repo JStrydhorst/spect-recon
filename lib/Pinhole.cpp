@@ -11,7 +11,7 @@ Pinhole::Pinhole(float x, float y, float z, float dia, float angle, float fy, fl
 	__m128 temp;
 	__m128 temp2;
 
-	location = _mm_set_ps(0,z,y,x);
+	location.v = _mm_set_ps(0,z,y,x);
 
 	cone_angle = angle;
 	diameter = dia;

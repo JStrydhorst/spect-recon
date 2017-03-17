@@ -1,11 +1,12 @@
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <smmintrin.h>
 
 using namespace std;
 
-#include "../lib/pinhole.h"
-#include "../lib/proj_table.h"
+#include "../lib/Pinhole.h"
+#include "../lib/ProjTable.h"
 
 #define N_SUBPIX 10
 #define N_SUBVOX 2
@@ -15,15 +16,15 @@ bool in_cone(__m128 &point, __m128 &apex, __m128 &normal, float &cos2alpha);
 
 void SaveBin(char* filename, float** image, int nx, int ny);
 
-void main()
+int main()
 {
 	char filename[260];
 
 	int ph;
 	int i,j,k;	// voxel indices (i=z, j=y, k=x)
-//	int vox_index;
+
 	int m,n;	// pixel indices (m=z, n=y)
-//	int pix_index;
+
 	int sub_i, sub_j, sub_k;
 	int sub_m, sub_n;
 
@@ -50,7 +51,7 @@ void main()
 	char aperture[] = "APT2";
 	int n_pinholes;
 	sprintf(filename,"%s.pin",aperture);
-	Pinhole** pinholes = LoadPinholeGeometry(filename, RoR, n_pinholes);
+	Pinhole** pinholes = Pinhole::LoadPinholeGeometry(filename, RoR, n_pinholes);
 	__m128 plane1 = _mm_set_ps(0.0,0.0,0.0,40.0f);	// back of collimator is nominally 45 mm from axis
 	__m128 plane2 = _mm_set_ps(0.0,0.0,0.0,50.0f);
 
@@ -74,7 +75,9 @@ void main()
 
 	float sum;
 
-	__declspec(align(16)) float fl_array[4];
+//	__declspec(align(16)) float fl_array[4];
+
+	float fl_array[4] __attribute__ ((aligned(16)));
 
 	// precalculate x, y, z
 	float *src_x, *src_y, *src_z;
@@ -112,7 +115,7 @@ void main()
 	for(i=0;i<nxy;i++)
 		rot_mask[i] = new float[nxy];
 	
-	unsigned int rad_sq = 57; // 2 pixel margin allows 5 pixel gaussian matrix (usually use 3 anyways)
+	unsigned int rad_sq = 60; // 2 pixel margin allows 5 pixel gaussian matrix (usually use 3 anyways)
 	rad_sq *= rad_sq;
 
 	float xy_offset = (nxy-1)/2.0f;
@@ -126,16 +129,16 @@ void main()
 	for(ph=0;ph<n_pinholes;ph++)
 	{
 		cout << "Pinhole: " << ph+1 << endl;
-		cout << "(" << pinholes[ph]->location.m128_f32[0] << ", " << pinholes[ph]->location.m128_f32[1] << ", "<< pinholes[ph]->location.m128_f32[2] << ")" << endl; 
+		cout << "(" << pinholes[ph]->location.x << ", " << pinholes[ph]->location.y << ", "<< pinholes[ph]->location.z << ")" << endl; 
 
 		// create a table for each pinhole
 		proj_table = new ProjTable();
 
-		pinhole_loc = pinholes[ph]->location;
+		pinhole_loc = pinholes[ph]->location.v;
 		normal = pinholes[ph]->normal;
 
 		// calculate the square of the cone opening angle for later use
-		cos_2a = cos(pinholes[ph]->cone_angle) * cos(pinholes[ph]->cone_angle);
+		cos_2a = std::cos(pinholes[ph]->cone_angle) * std::cos(pinholes[ph]->cone_angle);
 
 		// calculate effective pinhole radius
 		pinhole_rad = (pinholes[ph]->diameter)/2.0f; // for tungsten and 140keV, penetration is minimal
@@ -253,7 +256,6 @@ void main()
 
 								if(sum>1.0f)
 									proj_table->AddEntry(i,j,k,m,n,sum/(N_SUBVOX*N_SUBVOX*N_SUBVOX*N_SUBPIX*N_SUBPIX));
-												
 							}
 							
 
@@ -264,7 +266,7 @@ void main()
 		cout << endl;
 		cout << "Table length: " << proj_table->n << " (" << proj_table->n*9/1024 << " kB)" << endl;
 
-		sprintf_s(filename, "%s_%d_%d_%3.1f_%d_%d_%3.1f_%d.pta",aperture,nxy,nz,res,proj_nyz,proj_nyz,proj_res,ph);
+		sprintf(filename, "%s_%d_%d_%3.1f_%d_%d_%3.1f_%d.pta",aperture,nxy,nz,res,proj_nyz,proj_nyz,proj_res,ph);
 
 		proj_table->SaveProjTable(filename);
 
@@ -275,6 +277,8 @@ void main()
 	for(i=0;i<n_pinholes;i++)
 		delete pinholes[i];
 	delete [] pinholes;
+
+	return 0;
 }
 
 void intersect_plane_line(__m128 &p0, __m128 &norm, __m128 &l0, __m128 &l, __m128 &intersect) 
