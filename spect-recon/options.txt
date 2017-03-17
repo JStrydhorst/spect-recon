@@ -3,7 +3,7 @@ Usage:
 
 The following options are hardcoded for the moment
 Projection input file:          [working-dir]/SPECT.dcm
-Scatter input file:             [xorking-dir]/scatter.dcm
+Scatter input file:             [working-dir]/scatter.dcm
 Normalizion file directory:     [working-dir]/norms/      [must exist before running the reconstruction]
 Attenuation map directory:      [working-dir]/atten/      [must exist before creating the cumulative attenuations maps]
 Output directory:               [working-dir]/recons/     [must exist before running the reconstruction]
