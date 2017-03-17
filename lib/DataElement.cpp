@@ -340,7 +340,7 @@ unsigned long DataElement::GetSize()
 uint32_t DataElement::GetValue(void* buffer, unsigned long buf_size)
 {
 	if (VRMap[VR] == VR_SQ)	// SQ data isn't stored in value
-		return -1;
+		return 0xFFFFFFFF;
 
 	if (buf_size < Length)
 		return 0;

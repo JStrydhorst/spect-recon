@@ -26,8 +26,8 @@ public:
 	int DeleteElement(unsigned short Group, unsigned short Element);
 	int ModifyElement(unsigned short Group, unsigned short Element, void* newVal, unsigned long newLen);
 	int FindElement(unsigned short Group, unsigned short Element);
-	unsigned long GetLength(unsigned short Group, unsigned short Element);	// Length of the specified Element
-	unsigned long GetValue(unsigned short Group, unsigned short Element, void* buff, unsigned long buf_size);
+	uint32_t GetLength(unsigned short Group, unsigned short Element);	// Length of the specified Element
+	uint32_t GetValue(unsigned short Group, unsigned short Element, void* buff, unsigned long buf_size);
 
 	DicomObj* GetSQObject(unsigned short Group, unsigned short Element, int n=0);
 

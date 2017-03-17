@@ -391,13 +391,13 @@ int DicomObj::DeleteElement(unsigned short Group, unsigned short Element)
 / Finds the element specified, then calls
 / returns the length of the object
 ******************************************/
-unsigned long DicomObj::GetLength(unsigned short Group, unsigned short Element)
+uint32_t DicomObj::GetLength(unsigned short Group, unsigned short Element)
 {
 	// find the element
 	if(FindElement(Group, Element))
 		return dynamic_cast<DataElement*>(currentObj)->GetLength();	// copy the data into the buffer
 	else
-		return -1;	// (gggg,eeee) pair not found
+		return 0xFFFFFFFF;	// (gggg,eeee) pair not found
 }
 
 /******************************************
@@ -407,13 +407,13 @@ unsigned long DicomObj::GetLength(unsigned short Group, unsigned short Element)
 / the number of bytes copied, or -1 if the
 / DataElement isn't found.
 ******************************************/
-unsigned long DicomObj::GetValue(unsigned short Group, unsigned short Element, void* buffer, unsigned long buf_size)
+uint32_t DicomObj::GetValue(unsigned short Group, unsigned short Element, void* buffer, unsigned long buf_size)
 {
 	// find the element
 	if(FindElement(Group, Element))
 		return dynamic_cast<DataElement*>(currentObj)->GetValue(buffer, buf_size);	// copy the data into the buffer
 	else
-		return -1;	// (gggg,eeee) pair not found
+		return 0xFFFFFFFF;	// (gggg,eeee) pair not found
 }
 
 /**************************************
