@@ -9,7 +9,7 @@ LIBS = $(addprefix $(LIB_DIR)/, fft.o fft8g.o HDLListObj.o DataElement.o DicomOb
 
 .PHONY : all libs clean
 
-all : spect_recon
+all : spect-recon
 
 $(LIBS) :
 	$(MAKE) -C $(LIB_DIR)
@@ -19,8 +19,8 @@ spect_osem4d.o : spect_osem4d.cpp Reconstruction.h Projection.h version.h
 
 Reconstruction.o : Projection.h AttenMap.h
 
-spect_recon : $(OBJS) $(LIBS)
-	$(CXX) $(LFLAGS) $(OBJS) $(LIBS) -o spect_recon
+spect-recon : $(OBJS) $(LIBS)
+	$(CXX) $(LFLAGS) $(OBJS) $(LIBS) -o spect-recon
 
 %.o : %.cpp %.h 
 	$(CXX) $(CXXFLAGS) -I$(INC_DIR) $< 

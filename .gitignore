@@ -1,0 +1,4 @@
+*.o
+spect-recon/spect-recon
+create-sysmat/create-sysmat
+
